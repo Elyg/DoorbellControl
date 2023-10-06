@@ -2,7 +2,7 @@
 
 ## Workflow process
 
-### RPI imagine
+## RPI imagin
 1. install rpi lite (rpi imager)
 2. enable ssh
 3. setup wifi (keyboard, screen or via config if that works)
@@ -11,7 +11,7 @@
 sudo apt update
 sudo apt upgrade
 ```
-### git setup
+## git setup
 
 1. install git
 ```
@@ -29,8 +29,14 @@ cat .pub file
 3. paste the .pub contents to ssh key
 4. initialize empty repo in github
 5. git clone <repo>
+6. config git
+```
+git config --global user.email "etitas@gmail.com"
+git config --global user.name "Elyg"
+```
 
-### setup python
+
+## setup python
 
 1. install python pip
 ```
@@ -42,7 +48,7 @@ pip --version
 sudo apt install python3-venv
 ```
 
-### project setup
+## project setup
 1. create folder structure
 ```
 mkdir python
@@ -60,3 +66,11 @@ python -m venv .venv
 ```
 source .venv/bin/activate
 ```
+4. git sync
+```
+git add --all
+git commit -am "setup"
+git push
+```
+
+Begin to code
