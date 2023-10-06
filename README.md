@@ -2,7 +2,7 @@
 
 ## General Workflow process
 
-## RPI imagin
+## RPI image
 1. install rpi lite (rpi imager)
 2. enable ssh
 3. setup wifi (keyboard, screen or via config if that works)
@@ -11,6 +11,11 @@
 sudo apt update
 sudo apt upgrade
 ```
+
+## router set persistant ip
+1. navigate to modem page
+2. find ip of the rpi and set to be static
+
 ## git setup
 
 1. install git

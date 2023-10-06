@@ -4,4 +4,4 @@
 2. in settings configure ssh shells for your project
 3. save prefs and connections
 
-![Preview](../images/image.png)
+![Example screenshot](images/image.png)
