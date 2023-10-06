@@ -39,7 +39,10 @@ cat .pub file
 git config --global user.email "etitas@gmail.com"
 git config --global user.name "Elyg"
 ```
-
+7. git sync cmd
+```
+git add --all && git commit -am "updated" && git push
+```
 
 #### 4. setup python
 
