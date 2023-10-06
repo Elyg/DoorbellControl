@@ -1,6 +1,6 @@
 # DoorbellControl
 
-## Workflow process
+## General Workflow process
 
 ## RPI imagin
 1. install rpi lite (rpi imager)
@@ -73,4 +73,4 @@ git commit -am "setup"
 git push
 ```
 
-Begin to code
+## Begin to code
