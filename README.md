@@ -2,7 +2,7 @@
 
 ## General Workflow process
 
-## RPI image
+#### 1. RPI image
 1. install rpi lite (rpi imager)
 2. enable ssh
 3. setup wifi (keyboard, screen or via config if that works)
@@ -12,11 +12,11 @@ sudo apt update
 sudo apt upgrade
 ```
 
-## router set persistant ip
+#### 2. router set persistant ip
 1. navigate to modem page
 2. find ip of the rpi and set to be static
 
-## git setup
+#### 3. git setup
 
 1. install git
 ```
@@ -41,7 +41,7 @@ git config --global user.name "Elyg"
 ```
 
 
-## setup python
+#### 4. setup python
 
 1. install python pip
 ```
@@ -53,7 +53,7 @@ pip --version
 sudo apt install python3-venv
 ```
 
-## project setup
+#### 5. project setup
 1. create folder structure
 ```
 mkdir python
@@ -78,4 +78,4 @@ git commit -am "setup"
 git push
 ```
 
-## Begin to code
+### Begin to code
