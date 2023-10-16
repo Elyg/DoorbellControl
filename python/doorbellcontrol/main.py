@@ -15,7 +15,8 @@ GPIO_RELAY = 17
 DEVICE_RELAY = DigitalOutputDevice(pin=GPIO_RELAY, active_high=False)
 
 def relay_turn_on():
-    DEVICE_RELAY.on() # relay .on() no bell
+    if DOORBELL_STATE.mode:
+        DEVICE_RELAY.on() # relay .on() no bell
     print("Relay ON! {}".format(DEVICE_RELAY.value))
     
 def relay_turn_off():
@@ -28,8 +29,8 @@ def relay_turn_off():
     print("Relay OFF! {}".format(DEVICE_RELAY.value))
     
 
-# systemctl restart doorbell.service
-# journalctl -u doorbell.service
+# sudo systemctl restart doorbell.service
+# journalctl -u doorbell.service -f
 print("MODE: {}".format(DOORBELL_STATE.mode))
 button = Button(GPIO_BUTTON)
 button.when_pressed = relay_turn_on
