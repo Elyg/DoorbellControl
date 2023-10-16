@@ -30,6 +30,8 @@ class DoorBellState():
         print("Attaching changes listener!")
         doc_ref.on_snapshot(lambda x, y, z : self.query_modified(doc_snapshot=x, changes=y, read_time=z))
 
+        self.db = db
+        
     def query_modified(self, doc_snapshot, changes, read_time):
         for change in changes:
             if change.type.name == 'MODIFIED':
