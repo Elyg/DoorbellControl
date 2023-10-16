@@ -1,0 +1,12 @@
+[Unit]
+Description=Doorbell rpi service
+After=multi-user.target
+
+[Service]
+Type=idle
+User=etitas
+ExecStart=/home/etitas/gits/DoorbellControl/scripts/doorbell.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
