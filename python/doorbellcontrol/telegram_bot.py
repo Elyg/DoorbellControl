@@ -1,5 +1,6 @@
 import logging
-from telegram import Update
+import os
+from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 
 from database import DoorBellState
@@ -10,6 +11,25 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+    msg="""Available commands for the home bot 🏠:
+
+/on - turn on doorbell
+/off - turn off doorbell
+/status - bot responds if doorbell is on or off
+    
+/phrase 
+bot responds you what current doorbell phrase is
+
+/phrase *new_phrase*
+bot sets new_phrase as the new phrase for the doorbell
+
+/help - show this help message
+
+"""
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode=constants.ParseMode.MARKDOWN)
 
 async def chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="CHAT ID:\n\n{}".format(update.effective_chat.id)) 
@@ -54,6 +74,9 @@ if __name__ == '__main__':
     application.add_handler(status_handler)
 
     status_handler = CommandHandler('phrase', phrase)
+    application.add_handler(status_handler)
+    
+    status_handler = CommandHandler('help', help)
     application.add_handler(status_handler)
     
     application.run_polling()
