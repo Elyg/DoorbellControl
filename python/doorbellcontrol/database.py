@@ -5,6 +5,7 @@ from firebase_admin import credentials, credentials, firestore
 class DoorBellState():
     def __init__(self, mode=True):
         self.mode = mode
+        self.phrase = "Doorbell Ring! Ring!"
         self.initialize()
         
     def initialize(self):  
@@ -26,6 +27,7 @@ class DoorBellState():
         
         print("Setting mode from Firebase DB!")
         self.mode = mode=doc_ref.get().to_dict()['mode']
+        self.phrase = mode=doc_ref.get().to_dict()['phrase']
         
         print("Attaching changes listener!")
         doc_ref.on_snapshot(lambda x, y, z : self.query_modified(doc_snapshot=x, changes=y, read_time=z))
@@ -37,4 +39,5 @@ class DoorBellState():
             if change.type.name == 'MODIFIED':
                 print(u'Modified New Value: {}'.format(change.document.to_dict()))
                 self.mode = change.document.to_dict()["mode"]
+                self.phrase = change.document.to_dict()["phrase"]
             
