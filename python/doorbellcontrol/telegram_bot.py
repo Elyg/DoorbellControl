@@ -23,8 +23,8 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 /phrase 
 bot responds you what current doorbell phrase is
 
-/phrase *new_phrase*
-bot sets new_phrase as the new phrase for the doorbell
+/phrase *newPhrase*
+bot sets newPhrase as the new phrase for the doorbell
 
 /help - show this help message
 
