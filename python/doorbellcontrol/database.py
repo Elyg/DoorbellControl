@@ -17,7 +17,7 @@ class DoorBellState():
         if self.use_calendar:
             time_now = get_local_datetime()
             
-            for event in calendar_events:
+            for event in self.calendar_events:
                 start = convert_datetime_to_local(event["start"])
                 end = convert_datetime_to_local(event["end"])
                 summary = event["summary"]
@@ -32,7 +32,19 @@ class DoorBellState():
     @mode.setter
     def mode(self, value):
         self._mode = value
-        
+    
+    def is_event_in_action(self):
+        if self.use_calendar:
+            time_now = get_local_datetime()
+            
+            for event in self.calendar_events:
+                start = convert_datetime_to_local(event["start"])
+                end = convert_datetime_to_local(event["end"])
+                summary = event["summary"]
+                if summary == "N" and start < time_now < end:
+                    return True  
+        return False
+    
     def initialize(self):  
         # path to secret db
         json_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "secret.json")
@@ -70,7 +82,7 @@ class DoorBellState():
     def sync_calendar_to_firebase(self):
         self.calendar_events = get_calendar_events()
         self.db.collection('settings').document("calendar").update({"events" : self.calendar_events})
-        self.calendar_events = calendar_ref.get().to_dict()["events"]
+        self.calendar_events = self.db.collection('settings').document("calendar").get().to_dict()["events"]
         
     def query_modified(self, doc_snapshot, changes, read_time, settings=True):
         for change in changes:
