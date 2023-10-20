@@ -1,7 +1,7 @@
 import os
 import firebase_admin
 from firebase_admin import credentials, credentials, firestore
-from google_calendar import get_calendar_events, get_local_datetime, convert_datetime_to_local
+from google_calendar import create_calendar_events, get_calendar_events, get_local_datetime, convert_datetime_to_local
 
 class DoorBellState():
     def __init__(self, mode=True):
@@ -16,7 +16,6 @@ class DoorBellState():
     def mode(self):
         if self.use_calendar:
             time_now = get_local_datetime()
-            
             for event in self.calendar_events:
                 start = convert_datetime_to_local(event["start"])
                 end = convert_datetime_to_local(event["end"])
@@ -36,14 +35,13 @@ class DoorBellState():
     def is_event_in_action(self):
         if self.use_calendar:
             time_now = get_local_datetime()
-            
             for event in self.calendar_events:
                 start = convert_datetime_to_local(event["start"])
                 end = convert_datetime_to_local(event["end"])
                 summary = event["summary"]
                 if summary == "N" and start < time_now < end:
-                    return True  
-        return False
+                    return (True, start, end)
+        return (False, None, None)
     
     def initialize(self):  
         # path to secret db
@@ -80,6 +78,7 @@ class DoorBellState():
         
         
     def sync_calendar_to_firebase(self):
+        create_calendar_events()
         self.calendar_events = get_calendar_events()
         self.db.collection('settings').document("calendar").update({"events" : self.calendar_events})
         self.calendar_events = self.db.collection('settings').document("calendar").get().to_dict()["events"]

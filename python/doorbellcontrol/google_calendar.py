@@ -10,7 +10,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 def get_credentials():
     creds = None
@@ -44,13 +44,17 @@ def get_local_datetime():
     local = get_localzone()
     return datetime.datetime.now().replace(tzinfo=local)   
     
-def get_calendar_events():
+def get_calendar_events(work=False):
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
 
     creds = get_credentials()
-    calendarId = 'i71m62sdv0scs65ecapi6dmcu2pq7p4s@import.calendar.google.com'
+    calendarId_work = 'i71m62sdv0scs65ecapi6dmcu2pq7p4s@import.calendar.google.com'
+    calendar_personal = '53ce33c33b6c94cb38d1c8e779b56dda91d8538fd60e183a788539ba137ac971@group.calendar.google.com'
+    
+    calendarId = calendarId_work if work else calendar_personal
+    
     max_results = 10
     
     try:
@@ -65,26 +69,21 @@ def get_calendar_events():
 
         if not events:
             print('No upcoming events found.')
-            return
+            return []
         
-        
-        date_format = "%Y-%m-%dT%H:%M:%SZ"  
+        if work:
+            date_format = "%Y-%m-%dT%H:%M:%SZ"
+        else:
+            date_format = "%Y-%m-%dT%H:%M:%S%z"
         events_list = []
         for event in events:
             start = event['start'].get('dateTime', event['start'].get('date'))
             end = event['end'].get('dateTime', event['end'].get('date'))
-            
+            #print(start)
+            #print(end)
             start = datetime.datetime.strptime(start, date_format)
             end = datetime.datetime.strptime(end, date_format) 
 
-            # start_local = convert_datetime_to_local(start)
-            # end_local = convert_datetime_to_local(end)
-            
-            # now = get_local_datetime() #+datetime.timedelta(hours=55)
-            # print(now)
-            # print(start, end, event['summary'])
-            # print(start_local, end_local, event['summary'])
-            # print(start_local < now < end_local)
             if "N" == event["summary"]:
                 events_list.append(
                                     {"start": start,
@@ -100,3 +99,60 @@ def get_calendar_events():
         return []
 
 
+def get_event_template(start, end, timezone, description='Doorbell is off', summary="N"):
+    event = {
+        'summary': summary,
+        'description': description,
+        'start': 
+            {
+            'dateTime': start,
+            'timeZone': timezone,
+            },
+        'end': 
+            {
+            'dateTime': end,
+            'timeZone': timezone,
+            }
+        }
+    return event
+
+def create_calendar_events(calendar_events=None):
+    creds = get_credentials()
+    #calendarId_work = 'i71m62sdv0scs65ecapi6dmcu2pq7p4s@import.calendar.google.com'
+    calendar_personal = '53ce33c33b6c94cb38d1c8e779b56dda91d8538fd60e183a788539ba137ac971@group.calendar.google.com'
+    calendarId = calendar_personal
+    
+    #max_results = 2
+    
+    try:
+        service = build('calendar', 'v3', credentials=creds)
+
+        work_calendar_events = get_calendar_events(work=True)
+        personal_calendar_events = get_calendar_events(work=False)
+        created_events = []
+        for event in work_calendar_events:
+            valid = True
+            offset_start = datetime.timedelta(hours=9)
+            offset_end = datetime.timedelta(hours=12)
+            start = convert_datetime_to_local(event["start"]+offset_start)
+            end = convert_datetime_to_local(event["end"]+offset_end)
+            for personal_event in personal_calendar_events:
+                personal_start = personal_event["start"]
+                personal_end = personal_event["end"]
+                if personal_start == start and personal_end == end:
+                    valid = False
+                    
+            if not valid:
+                print("Duplicate: {}".format(event))
+                continue
+            
+            print("Creating event!")
+            event_template = get_event_template(start=start.strftime("%Y-%m-%dT%H:%M:%S%z"), end=end.strftime("%Y-%m-%dT%H:%M:%S%z"), timezone=str(get_localzone()))
+            new_event = service.events().insert(calendarId=calendarId, body=event_template).execute()
+            created_events.append(new_event)
+            
+        return created_events
+            
+    except HttpError as error:
+        print('An error occurred: {}'.fromat(error))
+        return []

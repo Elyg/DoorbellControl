@@ -28,4 +28,7 @@ sudo systemctl start doorbell_calendar_sync.service
 journalctl -u doorbell.service -f
 journalctl -u doorbell_telegram.service -f
 journalctl -u doorbell_calendar_sync.service -f
+
+sudo systemctl restart doorbell.service && sudo systemctl restart doorbell_telegram.service && sudo systemctl restart doorbell_calendar_sync.service
+
 ```

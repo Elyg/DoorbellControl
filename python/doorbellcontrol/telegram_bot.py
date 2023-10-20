@@ -89,9 +89,9 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     use_calendar = DOORBELL.db.collection('settings').document("calendar").get().to_dict()["use_calendar"]
     
     door_status = "ON" if mode else "OFF"
-    event_in_action = DOORBELL.is_event_in_action()
-    if event_in_action and use_calendar:
-        door_status = "OFF (BY CALENDAR)" if event_in_action else "ON"
+    event_in_action, start, end = DOORBELL.is_event_in_action()
+    if event_in_action and use_calendar and mode == True:
+        door_status = "OFF (by calendar)\n{} - {}\n".format(start.strftime("%Y-%m-%d %H:%M"), end.strftime("%Y-%m-%d %H:%M")) if event_in_action else "ON"
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: {}\nUSE CALENDAR: {}".format(door_status, "ON" if use_calendar else "OFF"))
     
