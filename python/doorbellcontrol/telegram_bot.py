@@ -17,10 +17,10 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg="""Available commands for the home bot 🏠:
 
 /on - turn on doorbell
-/on *calendar* - use calendar for doorbell activation
+/on *calendar* - turn on use of calendar for doorbell activation
 
 /off - turn off doorbell
-/off *calendar* - dont use calendar for doorbell activation
+/off *calendar* - turn off use of calendar for doorbell activation
 
 /status - bot responds if doorbell is on or off, or calendar is in use
     
