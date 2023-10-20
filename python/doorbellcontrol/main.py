@@ -33,6 +33,7 @@ def relay_turn_off():
 # journalctl -u doorbell.service -f
 print("MODE: {}".format(DOORBELL_STATE.mode))
 print("PHRASE: {}".format(DOORBELL_STATE.phrase))
+print("USE CALENDAR: {}".format(DOORBELL_STATE.use_calendar))
 button = Button(GPIO_BUTTON)
 button.when_pressed = relay_turn_on
 button.when_released = relay_turn_off

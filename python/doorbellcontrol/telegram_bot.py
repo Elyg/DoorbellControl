@@ -17,8 +17,12 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg="""Available commands for the home bot 🏠:
 
 /on - turn on doorbell
+/on *calendar* - use calendar for doorbell activation
+
 /off - turn off doorbell
-/status - bot responds if doorbell is on or off
+/off *calendar* - dont use calendar for doorbell activation
+
+/status - bot responds if doorbell is on or off, or calendar is in use
     
 /phrase 
 bot responds you what current doorbell phrase is
@@ -26,11 +30,21 @@ bot responds you what current doorbell phrase is
 /phrase *newPhrase*
 bot sets newPhrase as the new phrase for the doorbell
 
+/force_sync_calendar - forces to sync calendar update, usually calendar gets synced every 2 times every day (9:00, 23:00)
+
+/chat_id - get id of telegram chat (for debug purpose)
+
 /help - show this help message
 
 """
     await context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode=constants.ParseMode.MARKDOWN)
-
+    
+async def force_sync_calendar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    DOORBELL.sync_calendar_to_firebase()
+    events = DOORBELL.db.collection('settings').document("calendar").get().to_dict()["events"]
+    use_calendar = DOORBELL.db.collection('settings').document("calendar").get().to_dict()["use_calendar"]
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Calendar Sync Done! Events set {}\nUSE CALENDAR: {}".format(len(events),  "ON" if use_calendar else "OFF")) 
+    
 async def chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="CHAT ID:\n\n{}".format(update.effective_chat.id)) 
     
@@ -45,18 +59,35 @@ async def phrase(update: Update, context: ContextTypes.DEFAULT_TYPE):
  
         
 async def turn_on(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    DOORBELL.db.collection('settings').document("settings").update({"mode" : True})
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: ON")
+    set_calendar = False
+    if len(context.args) > 0 and " ".join(context.args).lstrip():
+        if "calendar" == context.args[0].lstrip():
+            set_calendar = True
+    if set_calendar:
+        DOORBELL.db.collection('settings').document("calendar").update({"use_calendar" : True})
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="USE CALENDAR: ON")
+    else:
+        DOORBELL.db.collection('settings').document("settings").update({"mode" : True})
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: ON")
     
     
 async def turn_off(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    DOORBELL.db.collection('settings').document("settings").update({"mode" : False})
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: OFF")
+    set_calendar = False
+    if len(context.args) > 0 and " ".join(context.args).lstrip():
+        if "calendar" == context.args[0].lstrip():
+            set_calendar = True
+    if set_calendar:
+        DOORBELL.db.collection('settings').document("calendar").update({"use_calendar" : True})
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="USE CALENDAR: OFF")
+    else:
+        DOORBELL.db.collection('settings').document("settings").update({"mode" : False})
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: OFF")
     
     
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mode = DOORBELL.db.collection('settings').document("settings").get().to_dict()["mode"]
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: {}".format("ON" if mode else "OFF"))
+    use_calendar = DOORBELL.db.collection('settings').document("calendar").get().to_dict()["use_calendar"]
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: {}\nUSE CALENDAR: {}".format("ON" if mode else "OFF", "ON" if use_calendar else "OFF"))
     
 if __name__ == '__main__':
     application = ApplicationBuilder().token("***REMOVED***").build()
@@ -74,6 +105,9 @@ if __name__ == '__main__':
     application.add_handler(status_handler)
 
     status_handler = CommandHandler('phrase', phrase)
+    application.add_handler(status_handler)
+
+    status_handler = CommandHandler('force_calendar_sync', force_sync_calendar)
     application.add_handler(status_handler)
     
     status_handler = CommandHandler('help', help)
