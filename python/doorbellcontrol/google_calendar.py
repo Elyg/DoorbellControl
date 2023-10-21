@@ -1,3 +1,4 @@
+import json
 import datetime
 import pytz
 from tzlocal import get_localzone
@@ -11,6 +12,14 @@ from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
+
+def get_calendar_url(work=True):
+    json_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "calendar.json")
+    if json_file_path:
+        with open(json_file_path, "r") as f:
+            data = json.load(f)
+            return data["calendar_work"] if work else data["calendar_personal"]
+    return None
 
 def get_credentials():
     creds = None
@@ -50,8 +59,8 @@ def get_calendar_events(work=False):
     """
 
     creds = get_credentials()
-    calendarId_work = 'i71m62sdv0scs65ecapi6dmcu2pq7p4s@import.calendar.google.com'
-    calendar_personal = '53ce33c33b6c94cb38d1c8e779b56dda91d8538fd60e183a788539ba137ac971@group.calendar.google.com'
+    calendarId_work = get_calendar_url(work=True)
+    calendar_personal = get_calendar_url(work=False)
     
     calendarId = calendarId_work if work else calendar_personal
     
@@ -118,8 +127,7 @@ def get_event_template(start, end, timezone, description='Doorbell is off', summ
 
 def create_calendar_events(calendar_events=None):
     creds = get_credentials()
-    #calendarId_work = 'i71m62sdv0scs65ecapi6dmcu2pq7p4s@import.calendar.google.com'
-    calendar_personal = '53ce33c33b6c94cb38d1c8e779b56dda91d8538fd60e183a788539ba137ac971@group.calendar.google.com'
+    calendar_personal = get_calendar_url(work=False)
     calendarId = calendar_personal
     
     #max_results = 2

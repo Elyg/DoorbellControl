@@ -1,84 +1,26 @@
 # DoorbellControl
 
-## General Workflow process
+## How it all works
 
-#### 1. RPI image
-1. install rpi lite (rpi imager)
-2. enable ssh
-3. setup wifi (keyboard, screen or via config if that works)
-4. update pi
-```
-sudo apt update
-sudo apt upgrade
-```
+1. RPI is installed above the bell chime in a plastic housing and is powered over POE ethernet cable
+2. RPI is setup and wired based on the circuit diagram
+   1. Bell chime ring button is wired to the rpi
+   2. rpi is wired to a relay
+   4. Once the button is pressed rpi is activating the relay
+   5. A telegram notification is sent
+3. Relay activation is determined by settings defined by user
+4. User changes settings via telegram chat bot
+5. User settings gets saved to firecloud realtime database
+   1. mode: on/off - to ring chime or not
+   2. phrase: what telegram message says when bell rings
+   3. calendar: on/off - whether block the ring chime based on a calendar schedule
+   4. events: the calendar events when to block the door chime
+   
+* RPI is running 3 services
+    1. doorbell.service - for relay activation
+    2. doorbell_telegram.service - for telegram bot communication
+    3. doorbell_calendar_sync.service - for calendar sync (9:00 and 23:00 everyday runs a sync between 2 calendars and saves the events to firecloud db)
 
-#### 2. router set persistant ip
-1. navigate to modem page
-2. find ip of the rpi and set to be static
+## Project Workflow/Setup
 
-#### 3. git setup
-
-1. install git
-```
-sudo apt install git
-```
-2. create ssh key local
-```
-ssh-keygen
-<enter>
-<enter>
-<enter>
-
-cat .pub file
-```
-3. paste the .pub contents to ssh key
-4. initialize empty repo in github
-5. git clone <repo>
-6. config git
-```
-git config --global user.email "etitas@gmail.com"
-git config --global user.name "Elyg"
-```
-7. git sync cmd
-```
-git add --all && git commit -am "updated" && git push
-```
-
-#### 4. setup python
-
-1. install python pip
-```
-sudo apt install python3-pip
-pip --version
-```
-2. install python virtual env
-```
-sudo apt install python3-venv
-```
-
-#### 5. project setup
-1. create folder structure
-```
-mkdir python
-cd ./python
-mkdir <project_name>
-cd .<project_name>
-touch main.py
-```
-
-2. create virtual env
-```
-python -m venv .venv
-```
-3. source virtual env
-```
-source .venv/bin/activate
-```
-4. git sync
-```
-git add --all
-git commit -am "setup"
-git push
-```
-
-### Begin to code
+[Project Setup Table of Contents](docs/0_index.md)

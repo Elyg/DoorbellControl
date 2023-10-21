@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 
@@ -12,6 +13,14 @@ logging.basicConfig(
     level=logging.INFO
 )
 
+def get_other_tokens(name):
+    json_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "other_tokens.json")
+    if json_file_path:
+        with open(json_file_path, "r") as f:
+            data = json.load(f)
+            return data[name]
+    return None
+        
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     msg="""Available commands for the home bot 🏠:
@@ -96,7 +105,8 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: {}\nUSE CALENDAR: {}".format(door_status, "ON" if use_calendar else "OFF"))
     
 if __name__ == '__main__':
-    application = ApplicationBuilder().token("***REMOVED***").build()
+    bot_token = get_other_tokens("telegram_bot_token")
+    application = ApplicationBuilder().token(bot_token).build()
     
     turn_on_handler = CommandHandler('on', turn_on)
     application.add_handler(turn_on_handler)

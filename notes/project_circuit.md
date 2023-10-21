@@ -1,1 +1,0 @@
-![Rpi zero w pinout](images/rpi_zero_w_pinout.png)

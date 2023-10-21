@@ -1,5 +1,6 @@
 ## requirements
-
+[Back to Table of contents](0_index.md)
+___
 install pip
 ```
 sudo apt install python3-pip
@@ -10,6 +11,11 @@ sudo apt install python3-venv
 ```
 
 ### after sourceing .venv
+
+#### install gpiozero 
+```
+sudo apt install python3-gpiozero
+```
 ___
 
 for rpi pins

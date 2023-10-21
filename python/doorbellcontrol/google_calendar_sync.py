@@ -3,6 +3,9 @@ import datetime
 from database import DoorBellState
 
 def main():
+    """Syncs google calendar to firebase
+    every day at 9:00 and 23:00
+    """
     print("Initializing")
     doorbell = DoorBellState()
     last_sync_hour = 0
@@ -14,4 +17,6 @@ def main():
             last_sync_hour = now.hour
             print("Google calender synced {}".format(now))
         time.sleep(60*10)
-main()
+        
+if __name__ == '__main__':
+    main()

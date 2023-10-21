@@ -1,0 +1,9 @@
+firebase_admin==6.2.0
+google_api_python_client==2.104.0
+google_auth_oauthlib==1.1.0
+gpiozero==2.0
+protobuf==4.24.4
+python-telegram-bot==20.6
+pytz==2023.3.post1
+Requests==2.31.0
+tzlocal==5.1
