@@ -1,15 +1,11 @@
 import os
-import logging
 import firebase_admin
 from firebase_admin import credentials, credentials, firestore
 from google_calendar import create_calendar_events, get_calendar_events, get_local_datetime, convert_datetime_to_local
 from telegram_basic import send_telegram_message, get_other_tokens
 
-# blue
-logging.basicConfig(
-    format= "\033[34m"+'%(asctime)s - %(name)s - %(levelname)s - %(message)s'+"\033[0m",
-    level=logging.INFO
-)
+from custom_logger import setup_logger
+logger = setup_logger(__name__, color="Magenta")
 
 class DoorBellState():
     def __init__(self, mode=True, device_relay=None):
@@ -48,7 +44,7 @@ class DoorBellState():
                 end = convert_datetime_to_local(event["end"])
                 summary = event["summary"]
                 if summary == "Bell Off Auto" and start < time_now < end:
-                    logging.info("Calendar event in action!")
+                    logger.info("Calendar event in action!")
                     return False
                 
             return self._mode
@@ -91,9 +87,9 @@ class DoorBellState():
         # path to secret db
         json_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "secret.json")
         if os.path.exists(json_file_path):
-            logging.info("Secret exists!")
+            logger.info("Secret exists!")
         else:
-            logging.info("Secret does not exist!")
+            logger.info("Secret does not exist!")
             return  
         
         # Fetch the service account key JSON file contents
@@ -105,20 +101,20 @@ class DoorBellState():
         doc_ref = db.collection('settings').document("settings")
         calendar_ref = db.collection('settings').document("calendar")
         
-        logging.info("Setting mode from Firebase DB!")
+        logger.info("Setting mode from Firebase DB!")
         self.mode = doc_ref.get().to_dict()['mode']
         self.phrase = doc_ref.get().to_dict()['phrase']
         self.use_calendar = calendar_ref.get().to_dict()['use_calendar']
         self.calendar_events = calendar_ref.get().to_dict()["events"]
         
-        logging.info("Attaching changes listener!")
+        logger.info("Attaching changes listener!")
         doc_ref.on_snapshot(lambda x, y, z : self.query_modified(doc_snapshot=x, changes=y, read_time=z))
         calendar_ref.on_snapshot(lambda x, y, z : self.query_modified(doc_snapshot=x, changes=y, read_time=z, settings=False))
         
         self.db = db
-        logging.info("Reading google calendar!")
+        logger.info("Reading google calendar!")
         self.sync_calendar_to_firebase()
-        logging.info("Found: {}".format(len(self.calendar_events)))
+        logger.info("Found: {}".format(len(self.calendar_events)))
         
         
     def sync_calendar_to_firebase(self):
@@ -140,7 +136,7 @@ class DoorBellState():
         """
         for change in changes:
             if change.type.name == 'MODIFIED':
-                logging.info(u'Modified New Value: {}'.format(change.document.to_dict()))
+                logger.info(u'Modified New Value: {}'.format(change.document.to_dict()))
 
                 if settings:
                     self.mode = change.document.to_dict()["mode"]

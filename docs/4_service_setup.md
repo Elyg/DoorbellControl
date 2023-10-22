@@ -50,3 +50,13 @@ Restart all services
 ```
 sudo systemctl restart doorbell.service && sudo systemctl restart doorbell_telegram.service && sudo systemctl restart doorbell_calendar_sync.service
 ```
+
+stop all services
+```
+sudo systemctl stop doorbell.service && sudo systemctl stop doorbell_telegram.service && sudo systemctl stop doorbell_calendar_sync.service
+```
+
+start all services
+```
+sudo systemctl start doorbell.service && sudo systemctl start doorbell_telegram.service && sudo systemctl start doorbell_calendar_sync.service
+```

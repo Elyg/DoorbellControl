@@ -1,17 +1,12 @@
-import logging
 import os
 import json
 import asyncio
-
+import logging
 from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 
-# yellow
-logging.basicConfig(
-    format= "\033[33m"+'%(asctime)s - %(name)s - %(levelname)s - %(message)s'+"\033[0m",
-    level=logging.INFO
-)
-
+from custom_logger import setup_logger
+logger = setup_logger("httpx", color="Blue")
     
 def get_other_tokens(name):
     json_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "other_tokens.json")
@@ -75,7 +70,9 @@ class DoorbellTelegramBot():
     bot sets newPhrase as the new phrase for the doorbell
 
     /force\_sync\_calendar - forces to sync calendar update usually calendar gets synced every 2 times every day 9 00 and 23 00
-
+    
+    /ring - ring the doorbell once
+    
     /chat\_id - get id of telegram chat for debug purpose
 
     /help - show this help message
@@ -140,18 +137,18 @@ class DoorbellTelegramBot():
         await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: {}\nUSE CALENDAR: {}".format(door_status, "ON" if use_calendar else "OFF"))
     
     def run(self):
-        logging.info("3. Starting telegram bot...")
+        logger.info("1. Starting telegram bot...")
         self.application.run_polling()
-        logging.info("3. Ending telegram bot...") 
+        logger.info("2. Ending telegram bot...") 
 
 def _run_telegram_bot(telegram_bot=None):
     if telegram_bot:
-        logging.info("2. Starting telegram bot...")
+        logger.info("2. Starting telegram bot...")
         telegram_bot.run()
-    logging.info("2. End telegram bot...")
+    logger.info("2. End telegram bot...")
 
 def run_telegram_bot(bot):
-    logging.info("1. Starting telegram bot...")
+    logger.info("1. Starting telegram bot...")
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(_run_telegram_bot(bot))
