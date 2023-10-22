@@ -9,11 +9,11 @@ from telegram_basic import send_telegram_message, get_other_tokens
 from database import DoorBellState
 print(sys.executable)
 
-DOORBELL_STATE = DoorBellState()
 GPIO_BUTTON = 2
 GPIO_RELAY = 17
 DEVICE_RELAY = DigitalOutputDevice(pin=GPIO_RELAY, active_high=False)
 
+DOORBELL_STATE = DoorBellState()
 TELEGRAM_BOT_TOKEN = get_other_tokens("telegram_bot_token")
 TELEGRAM_CHAT_ID = get_other_tokens("telegram_chat_id")
 

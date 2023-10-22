@@ -2,6 +2,7 @@ import os
 import firebase_admin
 from firebase_admin import credentials, credentials, firestore
 from google_calendar import create_calendar_events, get_calendar_events, get_local_datetime, convert_datetime_to_local
+from telegram_basic import send_telegram_message, get_other_tokens
 
 class DoorBellState():
     def __init__(self, mode=True):
@@ -16,6 +17,15 @@ class DoorBellState():
         self.calendar_events = []
         self.db = None
         self.initialize()
+        
+    #     self.device_relay = None
+    #     if device_relay:
+    #         self.device_relay = device_relay
+    
+    # def ring(self, times=1):
+    #     if self.mode:
+    #         self.device_relay.blink(n=times)
+    #     send_telegram_message(message=self.phrase, token= get_other_tokens("telegram_bot_token"), chat_id=get_other_tokens("telegram_chat_id"))
     
     @property
     def mode(self):
@@ -33,7 +43,7 @@ class DoorBellState():
                 start = convert_datetime_to_local(event["start"])
                 end = convert_datetime_to_local(event["end"])
                 summary = event["summary"]
-                if summary == "N" and start < time_now < end:
+                if summary == "Bell Off Auto" and start < time_now < end:
                     print("Calendar event in action!")
                     return False
                 
@@ -62,7 +72,7 @@ class DoorBellState():
                 start = convert_datetime_to_local(event["start"])
                 end = convert_datetime_to_local(event["end"])
                 summary = event["summary"]
-                if summary == "N" and start < time_now < end:
+                if summary == "Bell Off Auto" and start < time_now < end:
                     return (True, start, end)
         return (False, None, None)
     

@@ -63,7 +63,7 @@ def get_calendar_events(work=False):
     calendar_personal = get_calendar_url(work=False)
     
     calendarId = calendarId_work if work else calendar_personal
-    
+    calendar_label = "N" if work else "Bell Off Auto"
     max_results = 10
     
     try:
@@ -93,7 +93,7 @@ def get_calendar_events(work=False):
             start = datetime.datetime.strptime(start, date_format)
             end = datetime.datetime.strptime(end, date_format) 
 
-            if "N" == event["summary"]:
+            if calendar_label == event["summary"]:
                 events_list.append(
                                     {"start": start,
                                     "end": end,
@@ -108,7 +108,7 @@ def get_calendar_events(work=False):
         return []
 
 
-def get_event_template(start, end, timezone, description='Doorbell is off', summary="N"):
+def get_event_template(start, end, timezone, description='Doorbell is off', summary="Bell Off Auto"):
     event = {
         'summary': summary,
         'description': description,

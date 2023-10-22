@@ -6,8 +6,8 @@
 3. [Project Setup](#heading):
    * [Repo folder strucutre](2_1_setup_folder_structure.md)
    * [Pip and venv](2_2_setup_pip.md)
-   * [Windows remote vscode workflow](2_3_setup_windows_remote.md)
-       * [Windows copy files to rpi](2_4_setup_windows_copy_files.md)
+   * [Windows remote vscode workflow](2_4_setup_windows_remote.md)
+       * [Windows copy files to rpi](2_3_setup_windows_copy_files.md)
 4. [Circuit and pinout](#heading)
     * [Circuit](3_2_circuit.md)
     * [Pinout](3_1_rpi_pinout.md)
