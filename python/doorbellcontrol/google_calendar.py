@@ -1,6 +1,7 @@
 import json
 import datetime
 import pytz
+import logging
 from tzlocal import get_localzone
 import os
 
@@ -9,6 +10,11 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
+logging.basicConfig(
+    format= "\033[35m"+'%(asctime)s - %(name)s - %(levelname)s - %(message)s'+"\033[0m",
+    level=logging.INFO
+)
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -77,7 +83,7 @@ def get_calendar_events(work=False):
         events = events_result.get('items', [])
 
         if not events:
-            print('No upcoming events found.')
+            logging.info('No upcoming events found.')
             return []
         
         if work:
@@ -104,7 +110,7 @@ def get_calendar_events(work=False):
         return events_list
             
     except HttpError as error:
-        print('An error occurred: {}'.fromat(error))
+        logging.info('An error occurred: {}'.fromat(error))
         return []
 
 
@@ -151,10 +157,10 @@ def create_calendar_events(calendar_events=None):
                     valid = False
                     
             if not valid:
-                print("Duplicate: {}".format(event))
+                logging.info("Duplicate: {}".format(event))
                 continue
             
-            print("Creating event!")
+            logging.info("Creating event!")
             event_template = get_event_template(start=start.strftime("%Y-%m-%dT%H:%M:%S%z"), end=end.strftime("%Y-%m-%dT%H:%M:%S%z"), timezone=str(get_localzone()))
             new_event = service.events().insert(calendarId=calendarId, body=event_template).execute()
             created_events.append(new_event)
@@ -162,5 +168,5 @@ def create_calendar_events(calendar_events=None):
         return created_events
             
     except HttpError as error:
-        print('An error occurred: {}'.fromat(error))
+        logging.info('An error occurred: {}'.fromat(error))
         return []
