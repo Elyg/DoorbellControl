@@ -65,3 +65,8 @@ show running services
 ```
 systemctl --type=service --state=running
 ```
+
+show colored logs
+```
+journalctl -u doorbell.service -f -o cat
+```
