@@ -60,3 +60,8 @@ start all services
 ```
 sudo systemctl start doorbell.service && sudo systemctl start doorbell_telegram.service && sudo systemctl start doorbell_calendar_sync.service
 ```
+
+show running services
+```
+systemctl --type=service --state=running
+```
