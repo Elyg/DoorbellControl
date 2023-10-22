@@ -24,8 +24,8 @@ class DoorBellState():
     
     def ring(self, times=1):
         if self.mode:
-            self.device_relay.blink(n=times)
-        send_telegram_message(message=self.phrase, token=get_other_tokens("telegram_bot_token"), chat_id=get_other_tokens("telegram_chat_id"))
+            self.device_relay.blink(on_time=0.1, off_time=0.1, n=times)
+        send_telegram_message(message=self.phrase+" (Manual)", token=get_other_tokens("telegram_bot_token"), chat_id=get_other_tokens("telegram_chat_id"))
     
     @property
     def mode(self):
