@@ -62,6 +62,6 @@ def setup_logger(name, color = "Reset", level=logging.INFO):
     logger = logging.getLogger(name)
     logger.setLevel(level)
     logger.addHandler(handler)
-    logger.propegate = False
+    logger.propagate = False
     
     return logger

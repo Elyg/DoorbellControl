@@ -4,10 +4,12 @@ import asyncio
 import logging
 from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
-
 from custom_logger import setup_logger
-logger = setup_logger("httpx", color="Blue")
-    
+
+setup_logger("", color="White")
+setup_logger("httpx", color="Blue",level=logging.WARNING)
+logger = setup_logger(__file__, color="Blue")
+
 def get_other_tokens(name):
     json_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config", "other_tokens.json")
     if json_file_path:
@@ -97,8 +99,7 @@ class DoorbellTelegramBot():
         else:
             phrase = self.doorbell_state.db.collection('settings').document("settings").get().to_dict()["phrase"]
             await context.bot.send_message(chat_id=update.effective_chat.id, text="CURRENT DOORBELL PHRASE:\n\n{}".format(phrase))
-    
-            
+       
     async def turn_on(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         set_calendar = False
         if len(context.args) > 0 and " ".join(context.args).lstrip():
@@ -110,7 +111,6 @@ class DoorbellTelegramBot():
         else:
             self.doorbell_state.db.collection('settings').document("settings").update({"mode" : True})
             await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: ON")
-        
         
     async def turn_off(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         set_calendar = False
@@ -128,7 +128,6 @@ class DoorbellTelegramBot():
     async def status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         mode = self.doorbell_state.db.collection('settings').document("settings").get().to_dict()["mode"]
         use_calendar = self.doorbell_state.db.collection('settings').document("calendar").get().to_dict()["use_calendar"]
-        
         door_status = "ON" if mode else "OFF"
         event_in_action, start, end = self.doorbell_state.is_event_in_action()
         if event_in_action and use_calendar and mode == True:
@@ -140,16 +139,3 @@ class DoorbellTelegramBot():
         logger.info("1. Starting telegram bot...")
         self.application.run_polling()
         logger.info("2. Ending telegram bot...") 
-
-def _run_telegram_bot(telegram_bot=None):
-    if telegram_bot:
-        logger.info("2. Starting telegram bot...")
-        telegram_bot.run()
-    logger.info("2. End telegram bot...")
-
-def run_telegram_bot(bot):
-    logger.info("1. Starting telegram bot...")
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(_run_telegram_bot(bot))
-    loop.close()

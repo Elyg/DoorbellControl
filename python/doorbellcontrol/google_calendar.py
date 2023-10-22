@@ -107,7 +107,7 @@ def get_calendar_events(work=False):
         return events_list
             
     except HttpError as error:
-        logger.info('An error occurred: {}'.fromat(error))
+        logger.error('An error occurred: {}'.fromat(error))
         return []
 
 
@@ -154,10 +154,10 @@ def create_calendar_events(calendar_events=None):
                     valid = False
                     
             if not valid:
-                logger.info("Duplicate: {}".format(event))
+                logger.warning("Duplicate {} == {}: {}   {}".format(event["summary"], personal_event["summary"], start.strftime("%Y-%m-%d %H:%M"), end.strftime("%Y-%m-%d %H:%M")))
                 continue
             
-            logger.info("Creating event!")
+            logger.info("Creating event! {}: {}{}".format(event["summary"], start.strftime("%Y-%m-%d %H:%M"), end.strftime("%Y-%m-%d %H:%M")))
             event_template = get_event_template(start=start.strftime("%Y-%m-%dT%H:%M:%S%z"), end=end.strftime("%Y-%m-%dT%H:%M:%S%z"), timezone=str(get_localzone()))
             new_event = service.events().insert(calendarId=calendarId, body=event_template).execute()
             created_events.append(new_event)
@@ -165,5 +165,5 @@ def create_calendar_events(calendar_events=None):
         return created_events
             
     except HttpError as error:
-        logger.info('An error occurred: {}'.fromat(error))
+        logger.error('An error occurred: {}'.fromat(error))
         return []

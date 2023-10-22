@@ -7,12 +7,10 @@ from signal import pause
 from telegram_bot import DoorbellTelegramBot
 from telegram_basic import send_telegram_message, get_other_tokens
 from database import DoorBellState
-
 from google_calendar_sync import sync_calendar
-
 from custom_logger import setup_logger
-logger = setup_logger(__name__, color="White")
 
+logger = setup_logger(__name__, color="Cyan")
 logger.info(sys.executable)
 
 GPIO_BUTTON = 2
@@ -24,7 +22,7 @@ TELEGRAM_CHAT_ID = get_other_tokens("telegram_chat_id")
 def relay_turn_on():
     if doorbell_state.mode:
         doorbell_state.device_relay.on() # relay .on() no bell
-    print("Relay ON! {}".format(doorbell_state.device_relay.value))
+    logger.info("Relay ON! {}".format(doorbell_state.device_relay.value))
     
 def relay_turn_off():
     if doorbell_state.mode:
@@ -32,8 +30,8 @@ def relay_turn_off():
     try:
         send_telegram_message(message=doorbell_state.phrase, token=TELEGRAM_BOT_TOKEN, chat_id=TELEGRAM_CHAT_ID)
     except Exception as e:
-        print(e)
-    print("Relay OFF! {}".format(doorbell_state.device_relay.value))
+        logger.error(e)
+    logger.info("Relay OFF! {}".format(doorbell_state.device_relay.value))
     
 if __name__ == '__main__':
     
