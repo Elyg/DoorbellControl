@@ -1,6 +1,7 @@
 import os
 import json
 import asyncio
+import time
 import logging
 from telegram import Update, constants
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
@@ -49,31 +50,46 @@ class DoorbellTelegramBot():
 
         self.application = application
         self.doorbell_state = doorbell_state
+        
+        self.running = True
 
     async def ring(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        self.doorbell_state.ring()
+
+        melody = False
+        n = 1
+        if len(context.args) > 0 and " ".join(context.args).lstrip():
+            arg = " ".join(context.args).lstrip()
+            logger.info(arg)
+            if arg == "melody":
+                melody = True
+            if arg.isdigit():
+                n = int(arg)
+                
+        self.doorbell_state.ring(times=n, melody=melody)
             
     async def help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         msg="""Available commands for the home bot 🏠:
 
     /on - turn on doorbell
-    /on calendar - turn on use of calendar for doorbell activation
+    /on calendar - turn on calendar events to override the bell
 
     /off - turn off doorbell
-    /off calendar - turn off use of calendar for doorbell activation
+    /off calendar - turn off the use of calendar
 
-    /status - bot responds if doorbell is on or off or calendar is in use
+    /status - prints the settings if bell and calendar is active
         
     /phrase 
-    bot responds you what current doorbell phrase is
+    prints the current doorbell phrase
 
     /phrase *newPhrase*
     bot sets newPhrase as the new phrase for the doorbell
 
-    /force\_sync\_calendar - forces to sync calendar update usually calendar gets synced every 2 times every day 9 00 and 23 00
+    /force\_sync\_calendar - syncs the calendar events (syncs automatically happen 2 times in a day at 9:00 and 23:00)
     
     /ring - ring the doorbell once
+    /ring n - ring the doorbell n times (capped at 5)
+    /ring melody - ring the doorbell melody
     
     /chat\_id - get id of telegram chat for debug purpose
 
@@ -136,6 +152,8 @@ class DoorbellTelegramBot():
         await context.bot.send_message(chat_id=update.effective_chat.id, text="DOORBELL: {}\nUSE CALENDAR: {}".format(door_status, "ON" if use_calendar else "OFF"))
     
     def run(self):
+        self.running = True
         logger.info("1. Starting telegram bot...")
         self.application.run_polling()
-        logger.info("2. Ending telegram bot...") 
+        logger.info("2. Ending telegram bot...")
+        self.running = False

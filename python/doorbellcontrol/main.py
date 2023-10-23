@@ -1,7 +1,9 @@
 import sys
+import os
 from threading import Thread
 
 from gpiozero import Button, DigitalOutputDevice
+import signal
 from signal import pause
 
 from telegram_bot import DoorbellTelegramBot
@@ -48,11 +50,13 @@ if __name__ == '__main__':
     button.when_pressed = lambda : relay_turn_on(doorbell_state)
     button.when_released = lambda : relay_turn_off(doorbell_state)
     
-    calendar_thread = Thread(target=lambda: sync_calendar(doorbell_state))
+    calendar_thread = Thread(target=lambda: sync_calendar(doorbell_state, bot_for_running=telegram_bot))
+    calendar_thread.daemon = True 
     calendar_thread.start()
     
     telegram_bot.run()
     calendar_thread.join()
-    
+    os.kill(os.getpid(), signal.SIGUSR1)
     pause()
+    logger.info("Shutdown!")
 

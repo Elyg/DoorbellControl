@@ -1,4 +1,5 @@
 import os
+import time
 import firebase_admin
 from firebase_admin import credentials, credentials, firestore
 from google_calendar import create_calendar_events, get_calendar_events, get_local_datetime, convert_datetime_to_local
@@ -22,9 +23,23 @@ class DoorBellState():
         self.initialize()
         self.device_relay = device_relay
     
-    def ring(self, times=1):
+    def ring(self, times=1, melody=False):
         if self.mode:
-            self.device_relay.blink(on_time=0.1, off_time=0.1, n=times)
+            times = min(times, 5)
+            if not melody:
+                self.device_relay.blink(on_time=0.1, off_time=0.15, n=times)
+            else:
+                melody_timings = [(0.1, 1), # tu
+                                (0.1, 0.5), (0.1, 0.5), (0.1, 1), #tu tu tu
+                                (0.1, 1), # tu
+                                (0.1, 1), # tu
+                                ]
+                for beat in melody_timings:
+                    _on = beat[0]
+                    _off = beat[1]
+                    #logger.info(beat)
+                    self.device_relay.blink(on_time=_on, off_time=_off, n=1)
+                    time.sleep(_off)
         send_telegram_message(message=self.phrase+" (Manual)", token=get_other_tokens("telegram_bot_token"), chat_id=get_other_tokens("telegram_chat_id"))
     
     @property
