@@ -21,12 +21,12 @@ GPIO_RELAY = 17
 TELEGRAM_BOT_TOKEN = get_other_tokens("telegram_bot_token")
 TELEGRAM_CHAT_ID = get_other_tokens("telegram_chat_id")
 
-def relay_turn_on():
+def relay_turn_on(doorbell_state):
     if doorbell_state.mode:
         doorbell_state.device_relay.on() # relay .on() no bell
     logger.info("Relay ON! {}".format(doorbell_state.device_relay.value))
     
-def relay_turn_off():
+def relay_turn_off(doorbell_state):
     if doorbell_state.mode:
         doorbell_state.device_relay.off() # relay .off() ring bell 
     try:
