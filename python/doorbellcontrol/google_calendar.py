@@ -10,6 +10,12 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from telegram_basic import send_telegram_message, get_other_tokens
+
+TELEGRAM_BOT_TOKEN = get_other_tokens("telegram_bot_token")
+TELEGRAM_CHAT_ID = get_other_tokens("telegram_chat_id")
+
+
 from custom_logger import setup_logger
 logger = setup_logger(__name__, color="Green")
 
@@ -41,7 +47,12 @@ def get_credentials():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 credentials_json, SCOPES)
-            creds = flow.run_local_server(port=0)
+            try:
+                creds = flow.run_local_server(port=0)
+            except Exception as e:
+                send_telegram_message(message="ERROR: Google calendar token expired!", token=TELEGRAM_BOT_TOKEN, chat_id=TELEGRAM_CHAT_ID)
+                logger.error(e)
+                raise Exception(e)
         # Save the credentials for the next run
         with open(token_json, 'w') as token:
             token.write(creds.to_json())
@@ -56,11 +67,10 @@ def get_local_datetime():
     local = get_localzone()
     return datetime.datetime.now().replace(tzinfo=local)   
     
-def get_calendar_events(work=False):
+def get_calendar_events(work=False, telegram_bot=None):
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
-
     creds = get_credentials()
     calendarId_work = get_calendar_url(work=True)
     calendar_personal = get_calendar_url(work=False)
