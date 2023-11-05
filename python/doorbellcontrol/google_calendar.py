@@ -42,17 +42,17 @@ def get_credentials():
         creds = Credentials.from_authorized_user_file(token_json, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                credentials_json, SCOPES)
-            try:
+        try:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    credentials_json, SCOPES)
                 creds = flow.run_local_server(port=0)
-            except Exception as e:
-                send_telegram_message(message="ERROR: Google calendar token expired!", token=TELEGRAM_BOT_TOKEN, chat_id=TELEGRAM_CHAT_ID)
-                logger.error(e)
-                raise Exception(e)
+        except Exception as e:
+            send_telegram_message(message="ERROR: Probably google calendar token expired!", token=TELEGRAM_BOT_TOKEN, chat_id=TELEGRAM_CHAT_ID)
+            logger.error(e)
+            raise Exception(e)
         # Save the credentials for the next run
         with open(token_json, 'w') as token:
             token.write(creds.to_json())
