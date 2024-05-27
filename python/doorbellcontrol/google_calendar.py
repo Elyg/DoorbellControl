@@ -10,6 +10,15 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from telegram_basic import send_telegram_message, get_other_tokens
+
+TELEGRAM_BOT_TOKEN = get_other_tokens("telegram_bot_token")
+TELEGRAM_CHAT_ID = get_other_tokens("telegram_chat_id")
+
+
+from custom_logger import setup_logger
+logger = setup_logger(__name__, color="Green")
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
@@ -33,12 +42,17 @@ def get_credentials():
         creds = Credentials.from_authorized_user_file(token_json, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                credentials_json, SCOPES)
-            creds = flow.run_local_server(port=0)
+        try:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    credentials_json, SCOPES)
+                creds = flow.run_local_server(port=0)
+        except Exception as e:
+            send_telegram_message(message="ERROR: Probably google calendar token expired!", token=TELEGRAM_BOT_TOKEN, chat_id=TELEGRAM_CHAT_ID)
+            logger.error(e)
+            raise Exception(e)
         # Save the credentials for the next run
         with open(token_json, 'w') as token:
             token.write(creds.to_json())
@@ -53,11 +67,10 @@ def get_local_datetime():
     local = get_localzone()
     return datetime.datetime.now().replace(tzinfo=local)   
     
-def get_calendar_events(work=False):
+def get_calendar_events(work=False, telegram_bot=None):
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
-
     creds = get_credentials()
     calendarId_work = get_calendar_url(work=True)
     calendar_personal = get_calendar_url(work=False)
@@ -77,7 +90,7 @@ def get_calendar_events(work=False):
         events = events_result.get('items', [])
 
         if not events:
-            print('No upcoming events found.')
+            logger.info('No upcoming events found.')
             return []
         
         if work:
@@ -104,7 +117,7 @@ def get_calendar_events(work=False):
         return events_list
             
     except HttpError as error:
-        print('An error occurred: {}'.fromat(error))
+        logger.error('An error occurred: {}'.fromat(error))
         return []
 
 
@@ -151,10 +164,10 @@ def create_calendar_events(calendar_events=None):
                     valid = False
                     
             if not valid:
-                print("Duplicate: {}".format(event))
+                logger.warning("Duplicate {} == {}: {}   {}".format(event["summary"], personal_event["summary"], start.strftime("%Y-%m-%d %H:%M"), end.strftime("%Y-%m-%d %H:%M")))
                 continue
             
-            print("Creating event!")
+            logger.info("Creating event! {}: {}{}".format(event["summary"], start.strftime("%Y-%m-%d %H:%M"), end.strftime("%Y-%m-%d %H:%M")))
             event_template = get_event_template(start=start.strftime("%Y-%m-%dT%H:%M:%S%z"), end=end.strftime("%Y-%m-%dT%H:%M:%S%z"), timezone=str(get_localzone()))
             new_event = service.events().insert(calendarId=calendarId, body=event_template).execute()
             created_events.append(new_event)
@@ -162,5 +175,5 @@ def create_calendar_events(calendar_events=None):
         return created_events
             
     except HttpError as error:
-        print('An error occurred: {}'.fromat(error))
+        logger.error('An error occurred: {}'.fromat(error))
         return []

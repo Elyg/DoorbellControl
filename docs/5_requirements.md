@@ -57,6 +57,5 @@ toekn.json - for google calendar
 ___
 ```
 sudo systemctl start doorbell.service
-sudo systemctl start doorbell_telegram.service
 ```
 

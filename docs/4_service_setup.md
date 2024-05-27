@@ -23,30 +23,27 @@ Setting up services so they autostart when rpi reboots
 Restart service
 ```
 sudo systemctl restart doorbell.service
-sudo systemctl restart doorbell_telegram.service
-sudo systemctl restart doorbell_calendar_sync.service
 ```
-
 Stop services
 ```
 sudo systemctl stop doorbell.service
-sudo systemctl stop doorbell_telegram.service
-sudo systemctl stop doorbell_calendar_sync.service
 ```
 Start services
 ```
 sudo systemctl start doorbell.service
-sudo systemctl start doorbell_telegram.service
-sudo systemctl start doorbell_calendar_sync.service
 ```
 See logs of services
 ```
 journalctl -u doorbell.service -f
-journalctl -u doorbell_telegram.service -f
-journalctl -u doorbell_calendar_sync.service -f
 ```
 
-Restart all services
+show colored logs
 ```
-sudo systemctl restart doorbell.service && sudo systemctl restart doorbell_telegram.service && sudo systemctl restart doorbell_calendar_sync.service
+journalctl -u doorbell.service -f -o cat
 ```
+
+show running services
+```
+systemctl --type=service --state=running
+```
+
