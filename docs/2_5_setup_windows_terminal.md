@@ -5,5 +5,5 @@ ___
 
 cmd profile
 ```
-%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe ssh etitas@<rpi_ip>
+%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe ssh <user>@<rpi_ip>
 ```
