@@ -35,8 +35,8 @@ cat .pub file
 5. git clone <repo>
 6. config git
 ```
-git config --global user.email "etitas@gmail.com"
-git config --global user.name "Elyg"
+git config --global user.email "<user>@gmail.com"
+git config --global user.name "<name>"
 ```
 7. git sync cmd
 ```

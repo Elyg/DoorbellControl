@@ -3,7 +3,7 @@
 ___
 #### example cmd
 ```
- scp.exe .\image.png <user>@192.168.2.58:~/gits/DoorbellControl/notes/images/
+ scp.exe .\image.png <user>@<ip>:~/gits/DoorbellControl/notes/images/
 ```
 enter passwd
 

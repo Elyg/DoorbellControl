@@ -44,6 +44,11 @@ for telegram
 pip install python-telegram-bot --upgrade
 ```
 
+for python git (auto update)
+```
+pip install git
+```
+
 ### other info
 ___
 ```
