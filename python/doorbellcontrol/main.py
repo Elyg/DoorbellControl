@@ -15,7 +15,6 @@ from custom_logger import setup_logger
 
 from datetime import datetime
 
-
 logger = setup_logger(__name__, color="Cyan")
 logger.info(sys.executable)
 
@@ -25,7 +24,7 @@ GPIO_RELAY = 17
 TELEGRAM_BOT_TOKEN = get_other_tokens("telegram_bot_token")
 TELEGRAM_CHAT_ID = get_other_tokens("telegram_chat_id")
 
-DEBUG = True
+DEBUG = False
 
 def shutdown_rpi():
     try:
