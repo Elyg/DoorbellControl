@@ -4,10 +4,25 @@ import firebase_admin
 from firebase_admin import credentials, credentials, firestore
 from google_calendar import create_calendar_events, get_calendar_events, get_local_datetime, convert_datetime_to_local
 from telegram_basic import send_telegram_message, get_other_tokens
+from datetime import datetime
 
 from custom_logger import setup_logger
 logger = setup_logger(__name__, color="Magenta")
 
+class Relay():
+    def __init__(self, device_relay):
+        self.device_relay = device_relay
+        
+    def on(self):
+        self.device_relay.on()
+        
+    def off(self):
+        self.device_relay.off()
+        
+    @property    
+    def value(self):
+        return self.device_relay.value
+    
 class DoorBellState():
     def __init__(self, mode=True, device_relay=None):
         """_summary_
@@ -21,13 +36,15 @@ class DoorBellState():
         self.calendar_events = []
         self.db = None
         self.initialize()
-        self.device_relay = device_relay
-    
+        self.device_relay = Relay(device_relay)
+        self.LAST_RING = None
+        self.RINGS = 0
+        
     def ring(self, times=1, melody=False):
         if self.mode:
             times = min(times, 5)
             if not melody:
-                self.device_relay.blink(on_time=0.1, off_time=0.15, n=times)
+                self.device_relay.device_relay.blink(on_time=0.1, off_time=0.15, n=times)
             else:
                 melody_timings = [(0.1, 1), # tu
                                 (0.1, 0.5), (0.1, 0.5), (0.1, 1), #tu tu tu
@@ -38,7 +55,7 @@ class DoorBellState():
                     _on = beat[0]
                     _off = beat[1]
                     #logger.info(beat)
-                    self.device_relay.blink(on_time=_on, off_time=_off, n=1)
+                    self.device_relay.device_relay.blink(on_time=_on, off_time=_off, n=1)
                     time.sleep(_off)
         send_telegram_message(message=self.phrase+" (Manual)", token=get_other_tokens("telegram_bot_token"), chat_id=get_other_tokens("telegram_chat_id"))
     
