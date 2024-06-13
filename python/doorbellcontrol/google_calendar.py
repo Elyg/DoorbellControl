@@ -48,7 +48,7 @@ def get_credentials():
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     credentials_json, SCOPES)
-                creds = flow.run_local_server(port=0)
+                creds = flow.run_local_server(open_browser=False)
         except Exception as e:
             send_telegram_message(message="ERROR: Probably google calendar token expired!", token=TELEGRAM_BOT_TOKEN, chat_id=TELEGRAM_CHAT_ID)
             logger.error(e)
